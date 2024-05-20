@@ -1,0 +1,8 @@
+source .venv/bin/activate
+
+export PYTHON_VERSION=$(cut -d' ' -f2 <<<  $(python -V))
+
+export ANEURYSM_WORKSPACE=$PWD
+export DATAPATH=$ANEURYSM_WORKSPACE/data
+
+export PYTHONPATH=$ANEURYSM_WORKSPACE:$PYTHONPATH

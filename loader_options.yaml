@@ -1,0 +1,3 @@
+channels:
+  MIN_HU: -200
+  MAX_HU: 1200
