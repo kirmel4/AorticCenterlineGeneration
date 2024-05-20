@@ -1,0 +1,4 @@
+voxel_shape: [16, 256, 256] #поменял порядок было 32 128 128
+steps: [16, 256, 256] #было 16 64 64
+ACCUMULATION_STEP: 1
+DATAPATH: '/home/kirill/library/dataz'

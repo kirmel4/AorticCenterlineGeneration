@@ -1,0 +1,55 @@
+FROM ubuntu:18.04
+
+### Python install
+
+ARG PYTHON_VERSION=${PYTHON_VERSION}
+ARG PYTHON_MAJOR_VERSION=${PYTHON_MAJOR_VERSION}
+
+RUN apt-get clean && apt-get update && apt-get install -y \
+    wget \
+    git \
+    cmake \
+    pkg-config \
+    libbz2-dev \
+    libffi-dev \
+    zlib1g-dev \
+    libssl-dev
+
+RUN wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
+    tar -xf Python-${PYTHON_VERSION}.tgz && \
+    cd Python-${PYTHON_VERSION} && \
+    ./configure --prefix=/usr --enable-shared --enable-optimizations --with-pkg-config=yes --with-system-ffi && \
+    make -j $(nproc) && \
+    make install
+
+ENV PYTHON_EXECUTABLE=/usr/bin/python${PYTHON_MAJOR_VERSION}
+ENV PYTHON_LIBRARY=/usr/lib/libpython${PYTHON_MAJOR_VERSION}.so
+ENV PYTHON_INCLUDE_DIR=/usr/include/python${PYTHON_MAJOR_VERSION}
+
+### VTMK install
+
+ARG ANEURYSM_WORKSPACE=$ANEURYSM_WORKSPACE
+
+RUN apt-get clean && apt-get update && apt-get install -y \
+    libxt-dev \
+    libgl1-mesa-glx \
+    libgl1-mesa-dev \
+    libglapi-mesa \
+    libosmesa-dev \
+    libssl-dev \
+    patchelf
+
+RUN git clone https://github.com/Kitware/CMake/ --branch v3.14.0  && cd CMake && ./bootstrap && make && make install
+
+WORKDIR /
+
+COPY vmtk/builder.sh vmtk-source/builder.sh
+RUN bash vmtk-source/builder.sh
+
+COPY vmtk/copier.sh vmtk-source/copier.sh
+RUN bash vmtk-source/copier.sh $ANEURYSM_WORKSPACE $PYTHON_VERSION
+
+ENTRYPOINT [ "sleep" ]
+CMD [ "300" ]
+
+
